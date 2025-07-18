@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pembukuan Keuangan</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #999;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    input, button {
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Pembukuan Keuangan</h2>
+  <form id="form">
+    <input type="date" id="tanggal" required>
+    <input type="text" id="keterangan" placeholder="Keterangan" required>
+    <input type="number" id="pemasukan" placeholder="Pemasukan">
+    <input type="number" id="pengeluaran" placeholder="Pengeluaran">
+    <button type="submit">Tambah</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Tanggal</th>
+        <th>Keterangan</th>
+        <th>Pemasukan</th>
+        <th>Pengeluaran</th>
+        <th>Saldo</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="tabel-keuangan"></tbody>
+  </table>
+
+  <script>
+    let saldo = 0;
+
+    document.getElementById('form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const tanggal = document.getElementById('tanggal').value;
+      const keterangan = document.getElementById('keterangan').value;
+      const pemasukan = parseInt(document.getElementById('pemasukan').value) || 0;
+      const pengeluaran = parseInt(document.getElementById('pengeluaran').value) || 0;
+
+      saldo += pemasukan - pengeluaran;
+
+      const tabel = document.getElementById('tabel-keuangan');
+      const baris = document.createElement('tr');
+      baris.innerHTML = `
+        <td>${tanggal}</td>
+        <td>${keterangan}</td>
+        <td>${pemasukan}</td>
+        <td>${pengeluaran}</td>
+        <td>${saldo}</td>
+        <td><button onclick="hapusBaris(this, ${pemasukan}, ${pengeluaran})">Hapus</button></td>
+      `;
+
+      tabel.appendChild(baris);
+      document.getElementById('form').reset();
+    });
+
+    function hapusBaris(button, pemasukan, pengeluaran) {
+      const row = button.parentElement.parentElement;
+      saldo -= pemasukan - pengeluaran;
+      row.remove();
+      updateSaldo();
+    }
+
+    function updateSaldo() {
+      const rows = document.querySelectorAll('#tabel-keuangan tr');
+      let tempSaldo = 0;
+      rows.forEach(row => {
+        const pemasukan = parseInt(row.cells[2].textContent) || 0;
+        const pengeluaran = parseInt(row.cells[3].textContent) || 0;
+        tempSaldo += pemasukan - pengeluaran;
+        row.cells[4].textContent = tempSaldo;
+      });
+      saldo = tempSaldo;
+    }
+  </script>
+</body>
+</html>
